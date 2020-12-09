@@ -1,0 +1,640 @@
+#include <iostream>
+#include <climits>
+#include <algorithm>
+using namespace std;
+
+int CLOOK(int arr[], int size, int n, int head)
+{
+    int seek_count = 0;
+	int distance, cur_track;
+
+	int* output = new int[n];
+	int* left = new int[size];
+	int* right = new int[size];
+
+	int left_count=0, right_count=0;
+	for(int i=0; i<size; i++)
+    {
+        if(arr[i] < head)
+        {
+            left[left_count] = arr[i];
+            left_count++;
+        }
+        else if(arr[i] > head)
+        {
+            right[right_count] = arr[i];
+            right_count++;
+        }
+    }
+
+    // sorting left and right array
+    sort(left, left + left_count);
+    sort(right, right + right_count);
+
+    int k=0;
+    // First service the requests on the right side of the head.
+	for (int i = 0; i < right_count; i++)
+    {
+		cur_track = right[i];
+
+		// Appending current track to seek sequence
+		output[k++] = cur_track;
+
+		// Calculate absolute distance
+		distance = cur_track - head;
+		if(distance < 0)
+        {
+            distance = -1 * distance;
+        }
+
+		// Increase the total count
+		seek_count += distance;
+
+		// Accessed track is now new head
+		head = cur_track;
+	}
+
+	// Once reached the right end jump to the last track that is needed to be serviced in left direction.
+	distance = head - left[0];
+	if(distance < 0)
+    {
+        distance = -1 * distance;
+    }
+	seek_count += distance;
+	head = left[0];
+
+	// Now service the requests again, which are left.
+	for (int i = 0; i < left_count; i++)
+    {
+		cur_track = left[i];
+
+		// Appending current track to seek sequence
+		output[k++] = cur_track;
+
+		// Calculate absolute distance
+		distance = cur_track - head;
+		if(distance < 0)
+        {
+            distance = -1 * distance;
+        }
+
+		// Increase the total count
+		seek_count += distance;
+
+		// Accessed track is now the new head
+		head = cur_track;
+	}
+
+	cout << "\nAccording to CLOOK : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < k; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+	delete [] left;
+	delete [] right;
+    delete [] output;
+    return seek_count;
+}
+
+int LOOK(int arr[], int size, int n, int head, string direction)
+{
+    int seek_count = 0;
+	int distance, cur_track;
+
+	int* output = new int[n];
+	int* left = new int[size];
+	int* right = new int[size];
+
+	int left_count=0, right_count=0;
+	for(int i=0; i<size; i++)
+    {
+        if(arr[i] < head)
+        {
+            left[left_count] = arr[i];
+            left_count++;
+        }
+        else if(arr[i] > head)
+        {
+            right[right_count] = arr[i];
+            right_count++;
+        }
+    }
+
+    // sorting left and right array
+    sort(left, left + left_count);
+    sort(right, right + right_count);
+
+    // run the while loop two times, one by one scanning right and left side of the head.
+    int k=0;
+	int run = 2;
+	while (run--)
+    {
+		if (direction == "left")
+		{
+			for (int i = left_count-1; i >= 0; i--)
+            {
+				cur_track = left[i];
+
+				// appending current track to seek sequence
+				output[k++] = cur_track;
+
+				// calculate absolute distance
+				distance = cur_track - head;
+				if(distance < 0)
+                {
+                    distance = -1 * distance;
+                }
+
+				// increase the total count
+				seek_count += distance;
+
+				// accessed track is now the new head
+				head = cur_track;
+			}
+			// reversing the direction
+			direction = "right";
+		}
+		else if (direction == "right")
+        {
+			for (int i = 0; i < right_count; i++)
+			{
+				cur_track = right[i];
+
+				// appending current track to seek sequence
+				output[k++] = cur_track;
+
+				// calculate absolute distance
+				distance = cur_track - head;
+				if(distance < 0)
+                {
+                    distance = -1 * distance;
+                }
+
+				// increase the total count
+				seek_count += distance;
+
+				// accessed track is now new head
+				head = cur_track;
+			}
+			// reversing the direction
+			direction = "left";
+		}
+	}
+
+    cout << "\nAccording to LOOK : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < k; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+	delete [] left;
+	delete [] right;
+    delete [] output;
+    return seek_count;
+}
+
+int CSCAN(int arr[], int size, int n, int head)
+{
+    int seek_count = 0;
+	int distance, cur_track;
+
+	int* output = new int[n];
+	int* left = new int[size];
+	int* right = new int[size];
+
+	int left_count=0, right_count=0;
+	for(int i=0; i<size; i++)
+    {
+        if(arr[i] < head)
+        {
+            left[left_count] = arr[i];
+            left_count++;
+        }
+        else if(arr[i] > head)
+        {
+            right[right_count] = arr[i];
+            right_count++;
+        }
+    }
+    left[left_count] = 0;
+    left_count++;
+    right[right_count] = n-1;
+    right_count++;
+
+    // sorting left and right array
+    sort(left, left + left_count);
+    sort(right, right + right_count);
+
+    // first service the requests on the right side of the head.
+    int k=0;
+	for (int i = 0; i < right_count; i++)
+    {
+		cur_track = right[i];
+
+		// appending current track to seek sequence
+		output[k++] = cur_track;
+
+		// calculate absolute distance
+		distance = cur_track - head;
+		if(distance < 0)
+        {
+            distance = -1 * distance;
+        }
+
+		// increase the total count
+		seek_count += distance;
+
+		// accessed track is now new head
+		head = cur_track;
+	}
+
+	// Now service the requests again which are left.
+	for (int i = 0; i < left_count; i++)
+    {
+		cur_track = left[i];
+
+		// appending current track to seek sequence
+		output[k++] = cur_track;
+
+		// calculate absolute distance
+		distance = cur_track - head;
+		if(distance < 0)
+        {
+            distance = -1 * distance;
+        }
+
+		// increase the total count
+		seek_count += distance;
+
+		// accessed track is now the new head
+		head = cur_track;
+	}
+
+	cout << "\nAccording to CSCAN : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < k; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+	delete [] left;
+	delete [] right;
+    delete [] output;
+    return seek_count;
+}
+
+int SCAN(int arr[], int size, int n, int head, string direction)
+{
+    int seek_count = 0;
+	int distance, cur_track;
+
+	int* output = new int[n];
+	int* left = new int[size];
+	int* right = new int[size];
+
+	int left_count=0, right_count=0;
+	for(int i=0; i<size; i++)
+    {
+        if(arr[i] < head)
+        {
+            left[left_count] = arr[i];
+            left_count++;
+        }
+        else if(arr[i] > head)
+        {
+            right[right_count] = arr[i];
+            right_count++;
+        }
+    }
+
+	if(direction == "left")
+    {
+        left[left_count] = 0;
+        left_count++;
+    }
+    else if(direction == "right")
+    {
+        right[right_count] = n-1;
+        right_count++;
+    }
+
+    // sorting left and right array
+    sort(left, left + left_count);
+    sort(right, right + right_count);
+
+    // run the while loop two times, one by one scanning right and left side of the head.
+    int k=0;
+    int run = 2;
+	while (run--)
+    {
+		if (direction == "left")
+		{
+			for (int i = left_count-1; i >= 0; i--)
+			{
+				cur_track = left[i];
+
+				// appending current track to seek sequence
+				output[k++] = cur_track;
+
+				// calculate absolute distance
+				distance = cur_track - head;
+				if(distance < 0)
+                {
+                    distance = -1 * distance;
+                }
+
+				// increase the total count
+				seek_count += distance;
+
+				// accessed track is now the new head
+				head = cur_track;
+			}
+			direction = "right";
+		}
+		else if(direction == "right")
+        {
+			for (int i = 0; i < right_count; i++)
+			{
+				cur_track = right[i];
+				// appending current track to seek sequence
+				output[k++] = cur_track;
+
+				// calculate absolute distance
+				distance = cur_track - head;
+				if(distance < 0)
+                {
+                    distance = -1 * distance;
+                }
+
+				// increase the total count
+				seek_count += distance;
+
+				// accessed track is now new head
+				head = cur_track;
+			}
+			direction = "left";
+		}
+	}
+
+    cout << "\nAccording to SCAN : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < k; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+    delete [] left;
+    delete [] right;
+	delete [] output;
+	return seek_count;
+}
+
+int SSTF(int arr[], int size, int head)
+{
+    // Output array
+    int* output = new int[size];
+    for(int i=0; i<size; i++)
+    {
+        output[i] = arr[i];
+    }
+
+    int seek_count = 0, distance;
+
+    int count=0;
+    while(count < size)
+    {
+        // Initially taking minimum difference to be very large
+        int min_diff = INT_MAX;
+        int min_index = count;
+        for(int i=count; i<size; i++)
+        {
+            int diff = output[i] - head;
+            if(diff < 0)
+            {
+                diff = -1 * diff;
+            }
+
+            if(diff < min_diff)
+            {
+                min_diff = diff;
+                min_index = i;
+            }
+        }
+
+        int temp = output[count];
+        output[count] = output[min_index];
+        output[min_index] = temp;
+
+        distance = min_diff;
+        seek_count += distance;
+        head = output[count];
+
+        count++;
+    }
+
+    cout << "\nAccording to SSTF : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < size; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+    delete [] output;
+    return seek_count;
+}
+
+int FCFS(int arr[], int size, int head)
+{
+	int seek_count = 0;
+	int distance, cur_track;
+
+	for (int i = 0; i < size; i++)
+    {
+		cur_track = arr[i];
+
+		// calculate absolute distance
+		distance = cur_track - head;
+		if(distance < 0)
+        {
+            distance = -1 * distance;
+        }
+
+		// increase the total count
+		seek_count += distance;
+
+		// accessed track is now new head
+		head = cur_track;
+	}
+	cout << "\nAccording to FCFS : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < size; i++)
+    {
+		cout << arr[i] << " ";
+	}
+	cout << endl;
+
+	return seek_count;
+}
+
+int SMCC(int arr[], int size, int n, int head)
+{
+    int seek_count = 0;
+	int distance, cur_track;
+
+	int* output = new int[n];
+	int* helper = new int[size];
+	for(int j=0; j<size; j++)
+    {
+        helper[j] = arr[j];
+    }
+
+    sort(helper, helper+size);
+    int mid = (size-1)/2;
+
+    int k=0;
+    if(head <= helper[mid])
+    {
+        for (int i=0; i<size; i++)
+        {
+            cur_track = helper[i];
+
+            // appending current track to seek sequence
+            output[k++] = cur_track;
+
+            // calculate absolute distance
+            distance = cur_track - head;
+            if(distance < 0)
+            {
+                distance = -1 * distance;
+            }
+
+            // increase the total count
+            seek_count += distance;
+
+            // accessed track is now the new head
+            head = cur_track;
+        }
+    }
+    else
+    {
+        for (int i = size-1; i >= 0; i--)
+        {
+            cur_track = helper[i];
+
+            // appending current track to seek sequence
+            output[k++] = cur_track;
+
+            // calculate absolute distance
+            distance = cur_track - head;
+            if(distance < 0)
+            {
+                distance = -1 * distance;
+            }
+
+            // increase the total count
+            seek_count += distance;
+
+            // accessed track is now new head
+            head = cur_track;
+        }
+    }
+
+	cout << "\nAccording to SMCC : " << endl;
+	cout << "Total number of tracks movement by R/W head = " << seek_count << endl;
+	cout << "Seek Sequence is" << endl;
+
+	for (int i = 0; i < k; i++)
+    {
+		cout << output[i] << " ";
+	}
+	cout << endl;
+
+	delete [] helper;
+    delete [] output;
+    return seek_count;
+}
+
+int main()
+{
+    int n, size;
+    cout << "Enter total number of tracks contain by a disk : ";
+    cin >> n;
+    cout << "How many requests are there in request queue : ";
+    cin >> size;
+
+	// Request array
+	int* arr = new int[size];
+	cout << "\nEnter track numbers contains by Requested queue :" <<endl;
+	for(int i=0; i<size; i++)
+    {
+        cin>>arr[i];
+        if(arr[i] < 0 || arr[i] > n-1)
+        {
+            cout << "Track number is not valid" << endl;
+            return 0;
+        }
+    }
+
+	int head;
+	cout << "Current position of R/W head : ";
+	cin >> head;
+	if(head < 0 || head > n-1)
+    {
+        cout << "Current position R/W head is not valid" << endl;
+        return 0;
+    }
+    string direction = "left";
+
+    int a[6];
+	a[0] = FCFS(arr, size, head);
+	a[1] = SSTF(arr, size, head);
+	a[2] = SCAN(arr, size, n, head, direction);
+	a[3] = CSCAN(arr, size, n, head);
+	a[4] = LOOK(arr, size, n, head, direction);
+	a[5] = CLOOK(arr, size, n, head);
+
+	int min = a[0];
+    for(int i=0; i<6; i++)
+    {
+        if(a[i] < min)
+        {
+            min = a[i];
+        }
+    }
+    cout << "\nLowest tracks movement by R/W head : " << min << endl << endl;
+
+    cout << "\n    **********************************" << endl;
+    int best = SMCC(arr, size, n, head);
+    if(best <= min)
+    {
+        cout << "Proposed Algorithm SMCC works better than all other algorithms" << endl;
+    }
+    else
+    {
+        cout << "Proposed Algorithm SMCC fails for this test case" << endl;
+    }
+    cout << "\n    **********************************" << endl << endl;
+
+	delete [] arr;
+	return 0;
+}
